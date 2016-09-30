@@ -1,0 +1,9 @@
+version: '2'
+services:
+  frontend:
+    volumes:
+    - ./frontend/src:/usr/app/src/src
+    - ./frontend/scripts:/usr/app/src/scripts
+    - ./frontend/config:/usr/app/src/config
+    environment:
+      - NODE_ENV=development
