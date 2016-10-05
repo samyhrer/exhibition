@@ -1,31 +1,67 @@
 var express = require('express');
 var router = express.Router();
 var terminal = require('../data/terminal');
+var Immutable = require('immutable');
 
 var upstreamMapper = (terminal) => {
   return {
+    type: 'terminal',
+    id: terminal.get('identifier'),
+    attributes: {
+      heartbeatTimestamp: terminal.get('heartbeatTimestamp')
+    },
     links: {
-      self: `/terminal/${terminal.identifier}`
+      self: `/terminal/${terminal.get('identifier')}`,
+      api: `/api/terminal/${terminal.get('identifier')}`,
+      heartbeat: `/api/heartbeat/${terminal.get('identifier')}`,
+      seamen: `/api/seamen`,
     }
   }
 }
 
-router.get('/', function(req, res) {
+var TerminalUpdate = Immutable.Record({});
+
+router.get('/', function(req, res, next) {
 	terminal
     .all()
     .then(
       (terminals)=>{
         res.send(terminals.map(upstreamMapper))
       },
-      (err, data)=>{
-        res.send('kake')
+      (err)=>{
+        next(err);
+      });
+});
+
+router.get('/:id', function(req, res, next) {
+  var identifier = req.params.id;
+  terminal
+    .get(identifier)
+    .then(
+      (terminal)=>{
+        res.send(upstreamMapper(terminal));
+      },
+      (err)=>{
+        next(err);
+      });
+});
+
+router.put('/:id', function(req, res, next) {
+  terminal
+    .update(req.params.id, TerminalUpdate(req.body))
+    .then(
+      (terminal)=>{
+        res.send(upstreamMapper(terminal));
+      },
+      (err)=>{
+        next(err);
       });
 });
 
 router.post('/', function(req, res, next) {
-  var number = req.body.number;
+  var order = req.body.order;
   terminal
-    .add(number)
+    .add(order)
     .then(
       (terminal)=>{
         res.send(upstreamMapper(terminal));
