@@ -2,14 +2,15 @@ import React, { Component } from 'react';
 import {
   Redirect
 } from 'react-router';
+import ws from '../data/ws';
 
 function hasVerticalScroll(node){
-  if(node == undefined){
+  if(node === undefined){
     if(window.innerHeight){
       return document.body.offsetHeight> innerHeight;
     }
     else {
-      return  document.documentElement.scrollHeight > 
+      return document.documentElement.scrollHeight > 
         document.documentElement.offsetHeight ||
         document.body.scrollHeight>document.body.offsetHeight;
       }
@@ -32,18 +33,12 @@ class Terminal extends Component {
       from: 0,
       to: 100
     }
-    this.ws = null;
   }
   componentDidMount() {
     this.loadServerState(() => {
       this.initHeartbeat();
-      var host = window.document.location.host.replace(/:.*/, '');
-      this.ws = new WebSocket('ws://' + host + ':8080');
-      this.ws.onmessage = (evt) => {
-        var message = JSON.parse(evt.data);
-        this.onMessage(message);
-      }
     });
+    ws.subscribe('START_PROVISION', this.onMessage.bind(this));
   }
   componentDidUpdate(prevProps, prevState) {
     if(this.state.seamen.length === 0){
@@ -106,17 +101,11 @@ class Terminal extends Component {
       </ul>
     );
   }
-  onMessage(message) {
-    switch(message.type){
-      case 'START_PROVISION':
-        if(this.state.terminal.id === message.payload.identifier){
-          this.datarange = message.payload.datarange;
-          this.provision(this.datarange.from, this.datarange.to);
-        };
-      break
-      default:
-      break;
-    }
+  onMessage(payload) {
+    if(this.state.terminal.id === payload.identifier){
+      this.datarange = payload.datarange;
+      this.provision(this.datarange.from, this.datarange.to);
+    };
   }
   provision(from, to) {
     fetch(`${this.state.terminal.links.seamen}?from=${from}&to=${to}`)

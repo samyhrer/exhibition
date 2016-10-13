@@ -3,7 +3,23 @@ var Immutable = require('immutable');
 var uuid = require('node-uuid');
 var terminalData = require('../data/terminal');
 var seamen = require('../data/seamen');
-var websocketClients = Immutable.List();
+var websocketClients = [];
+
+var upstreamMapper = (terminal) => {
+  return {
+    type: 'terminal',
+    id: terminal.get('identifier'),
+    attributes: {
+      heartbeatTimestamp: terminal.get('heartbeatTimestamp')
+    },
+    links: {
+      self: `/terminal/${terminal.get('identifier')}`,
+      api: `/api/terminal/${terminal.get('identifier')}`,
+      heartbeat: `/api/heartbeat/${terminal.get('identifier')}`,
+      seamen: `/api/seamen`,
+    }
+  }
+}
 
 var reset = () => {}
 
@@ -80,11 +96,30 @@ var handleMessage = (message, flags) => {
 }
 
 var add = (ws) => {
-  websocketClients = websocketClients.push(ws);
+  websocketClients.push(ws);
   ws.on('message', handleMessage);
 }
 
+var notifyRegistration = () => {
+  terminalData
+    .all()
+    .then(
+      (terminals) => {
+        var msg = JSON.stringify({
+                    type: 'REGISTER_SCREEN_UPDATE',
+                    payload: terminals.map(upstreamMapper)
+                  });
+        websocketClients.forEach((ws) => {
+          ws.send(msg)
+        });
+      },
+      (err)=>{
+        next(err);
+      });
+}
+
 module.exports = {
+  notifyRegistration: notifyRegistration,
   add: add,
   reset: reset,
   init: init

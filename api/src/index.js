@@ -24,6 +24,9 @@ const configureDefaultRoutes = (app) => {
   app.use('/api/seamen', require('./routes/seamen'));
   app.use('/api/heartbeat', require('./routes/heartbeat'));
   wss.on('connection', function connection(ws) {
+    ws.send(JSON.stringify({
+      type: 'ACK'
+    }));
     orchestrator.add(ws);
   });
 }

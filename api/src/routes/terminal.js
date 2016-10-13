@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var terminal = require('../data/terminal');
 var Immutable = require('immutable');
+var orchestrator = require('../services/orchestrator')
 
 var upstreamMapper = (terminal) => {
   return {
@@ -64,6 +65,7 @@ router.post('/', function(req, res, next) {
     .add(order)
     .then(
       (terminal)=>{
+        orchestrator.notifyRegistration(); //todo -- data/terminal should probably expose and update stream that orchestrator can subscribe to
         res.send(upstreamMapper(terminal));
       },
       (err)=>{

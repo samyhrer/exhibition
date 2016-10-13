@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Redirect
 } from 'react-router';
+import ws from '../data/ws';
 
 class RegisterScreen extends Component {
    constructor(props) {
@@ -16,7 +17,20 @@ class RegisterScreen extends Component {
     this.renderTerminal = this.renderTerminal.bind(this);
   }
   componentDidMount() {
-    this.loadState();
+    this.loadServerState((err)=>{
+      if(err){
+        console.log(err);
+        return;
+      }
+      ws.subscribe('REGISTER_SCREEN_UPDATE', this.onMessage.bind(this));
+    });
+  }
+  componentWillUnmount() {}
+  onMessage(payload) {
+    console.log(payload)
+    this.setState({
+      terminals: payload
+    });
   }
   render() {
     if(this.state.loaded === false){
@@ -78,7 +92,7 @@ class RegisterScreen extends Component {
         console.log(error);
       });
   }
-  loadState () {
+  loadServerState (cb) {
     fetch('/api/terminal')
       .then(response => response.json())
       .then((terminals) =>{
@@ -86,9 +100,11 @@ class RegisterScreen extends Component {
           loaded: true,
           terminals: terminals,
           freeTerminalIndex: terminals.length + 1
+        }, ()=>{
+          cb(null)
         })
       }, (err) => {
-        console.log(err);
+        cb(err)
       })
   }
 }
