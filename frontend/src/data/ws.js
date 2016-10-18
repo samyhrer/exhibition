@@ -1,8 +1,14 @@
 
 var subscriptions = {};
+import io from 'socket.io-client';
 
-var host = window.document.location.host.replace(/:.*/, '');
-var ws = new WebSocket('ws://' + host + ':8080');
+var socket = io('http://localhost:3000');
+socket.on('connect', function(){});
+socket.on('event', function(data){
+	console.log(data);
+});
+socket.on('disconnect', function(){});
+/*
 ws.onmessage = (evt) => {
 	var message = JSON.parse(evt.data);
 	var messageType = message.type;
@@ -13,7 +19,7 @@ ws.onmessage = (evt) => {
 		});
 	}
 }
-
+*/
 var subscribe = (messageType, cb) => {
 	var subscription = subscriptions[messageType];
 	if(!subscription) {
@@ -29,10 +35,12 @@ var unsubscribe = (messageType, cb) => {
 }
 
 var send = (messageType, payload) => {
+	/*
 	ws.send(JSON.stringify({
 		type: messageType,
 		payload: payload
 	}));
+	*/
 }
 
 module.exports = {

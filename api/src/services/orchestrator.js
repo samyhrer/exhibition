@@ -3,7 +3,6 @@ var Immutable = require('immutable');
 var uuid = require('node-uuid');
 var terminalData = require('../data/terminal');
 var seamen = require('../data/seamen');
-var websocketClients = [];
 
 var upstreamMapper = (terminal) => {
   return {
@@ -25,11 +24,18 @@ var reset = () => {}
 
 var from = 0;
 var to = 100;
+var io = null;
 
-
-var init = (from, to) => {
-  from = 0;
-  to = to;
+var init = (io, config) => {
+  io = io;
+  io.on('connection', function(socket){
+    console.log('screen or terminal connected');
+    socket.on('disconnect', function(){
+      console.log('screen or terminal disconnected');
+    });
+  });
+  from = config.from;
+  to = config.to;
   orchestrate();
   setInterval(orchestrate, 10000);
 }
@@ -37,6 +43,7 @@ var init = (from, to) => {
 var notProvisionedTerminal = (terminal) => {
   return terminal.get('provisionState') === terminalData.PROVISION_STATES.NOT_PROVISIONED;
 }
+
 var provsionInProgressTerminal = (terminal) => {
   return terminal.get('provisionState') === terminalData.PROVISION_STATES.IN_PROGRESS;
 }
@@ -55,6 +62,14 @@ var orchestrate = () => {
         provisionState: terminalData.PROVISION_STATES.IN_PROGRESS
       }).then((terminal)=>{
         console.log("orcestrate terminal" , terminal);
+        io.emit('START_PROVISION', {
+          identifier: terminal.get('identifier'),
+          datarange: {
+            from: from,
+            to: to
+          }
+        });
+        /*
         websocketClients.forEach((ws) => {
           ws.send(JSON.stringify({
             type: 'START_PROVISION',
@@ -67,6 +82,8 @@ var orchestrate = () => {
             }
           }))
         });
+        */
+
       }, ()=>{});
     }, (err) => {
       console.log(err);
