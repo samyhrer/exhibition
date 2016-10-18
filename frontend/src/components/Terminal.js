@@ -53,13 +53,11 @@ class Terminal extends Component {
       this.provision(this.datarange.from, this.datarange.to);
     }
     else {
-      this.ws.send(JSON.stringify({
-        type: 'PROVISION_DONE',
-        payload: {
+      ws.send('PROVISION_DONE', {
           datarange: this.datarange,
           identifier: this.state.terminal.id
         }
-      }));
+      );
     }
   }
   componentWillUnmount() {

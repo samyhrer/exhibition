@@ -55,6 +55,7 @@ var add = (order) => {
 }
 
 var update = (identifier, update) => {
+  console.log(update)
   terminals = terminals.update(terminals.findIndex(byIdentifier(identifier)), (terminal) => {
     return terminal.mergeDeep(update);
   });
