@@ -5,7 +5,7 @@ var Immutable = require('immutable');
 
 router.get('/', function(req, res, next) {
   var from = req.query.from || 0;
-  var to = req.query.to || 1000;
+  var to = req.query.to || 1500;
 	seamenData
     .range(from, to)
     .then(

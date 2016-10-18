@@ -34,7 +34,7 @@ module.exports = {
     cleanDeadTerminalsService.init();
     orchestrator.init(io, {
       from: 0,
-      to: 100
+      to: 1500
     });
   },
   startDev: () => {
@@ -46,7 +46,7 @@ module.exports = {
     cleanDeadTerminalsService.init();
     orchestrator.init(io, {
       from: 0,
-      to: 100
+      to: 1500
     });
   }
 };

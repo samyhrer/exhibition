@@ -1,5 +1,27 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: Tahoma, sans-serif;
+  background-color: #000;
+  color: #f0f0dc;
+  font-size: 12px;
+}
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+}
+li {
+  justify-content: center;
+  padding-bottom: 2px;
+}
+li:not(:last-child){
+  padding-right: 3px;
+}
+li:nth-child(odd){
+  font-weight: 600;
 }

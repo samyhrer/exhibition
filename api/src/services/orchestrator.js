@@ -23,7 +23,7 @@ var upstreamMapper = (terminal) => {
 var reset = () => {}
 
 var from = 0;
-var to = 100;
+var to = 1500;
 var xy = null;
 
 var init = (io, config) => {
@@ -41,7 +41,7 @@ var init = (io, config) => {
   orchestrate(io);
   setInterval(()=>{
     orchestrate(io)
-  }, 10000);
+  }, 15000);
 }
 
 var notProvisionedTerminal = (terminal) => {
@@ -90,9 +90,10 @@ var orchestrate = (io) => {
 var handleProvisionDone = (payload) => {
   //The client has found the set of data that fills the screen. ends the provision process
   from = payload.datarange.to;
-  to = from + 100;
+  to = from + 1500;
   var identifier = payload.identifier;
   terminalData.update(identifier, {
+    datarange: payload.datarange,
     provisionState: terminalData.PROVISION_STATES.PROVISIONED
   }).then((terminal)=>{}, () => {})
 }

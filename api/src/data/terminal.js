@@ -13,10 +13,7 @@ const PROVISION_STATES = {
 var Terminal = Immutable.Record({
   identifier: uuid.v4(),
   provisionState: PROVISION_STATES.NOT_PROVISIONED,
-  datarange: {
-    from: 0,
-    to: 100
-  }
+  datarange: null
 });
 
 var byIdentifier = (identifier) => {
@@ -55,8 +52,11 @@ var add = (order) => {
 }
 
 var update = (identifier, update) => {
-  console.log(update)
-  terminals = terminals.update(terminals.findIndex(byIdentifier(identifier)), (terminal) => {
+  var index = terminals.findIndex(byIdentifier(identifier));
+  if(index === -1){
+    return Promise.reject();
+  }
+  terminals = terminals.update(index, (terminal) => {
     return terminal.mergeDeep(update);
   });
   return get(identifier);

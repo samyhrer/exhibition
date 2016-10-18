@@ -5,11 +5,13 @@ var Immutable = require('immutable');
 var orchestrator = require('../services/orchestrator')
 
 var upstreamMapper = (terminal) => {
+  console.log(terminal.toJS())
   return {
     type: 'terminal',
     id: terminal.get('identifier'),
     attributes: {
-      heartbeatTimestamp: terminal.get('heartbeatTimestamp')
+      heartbeatTimestamp: terminal.get('heartbeatTimestamp'),
+      datarange: terminal.get('datarange')
     },
     links: {
       self: `/terminal/${terminal.get('identifier')}`,

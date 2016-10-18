@@ -31,18 +31,26 @@ class Terminal extends Component {
     this.heartbeatTimer = null;
     this.datarange = {
       from: 0,
-      to: 100
+      to: 1500
     }
   }
   componentDidMount() {
     this.loadServerState(() => {
       this.initHeartbeat();
+      var datarange = this.state.terminal.attributes.datarange;
+      if(datarange){
+        this.provision(datarange.from, datarange.to);
+      }
     });
     ws.subscribe('START_PROVISION', this.onMessage.bind(this));
   }
   componentDidUpdate(prevProps, prevState) {
     if(this.state.seamen.length === 0){
       return
+    }
+    var datarange = this.state.terminal.attributes.datarange;
+    if(datarange){
+      return //already provisioned
     }
     var hasVScroll = hasVerticalScroll();
     if(hasVScroll){
@@ -91,7 +99,7 @@ class Terminal extends Component {
       }}>
         { seamen.map((seaman, index) => {
           return (
-            <li key={seaman.displayName + index}>
+            <li onClick={ ()=>{ alert(seaman.displayName)} } key={seaman.displayName + index}>
               { seaman.displayName }
             </li>
           );
